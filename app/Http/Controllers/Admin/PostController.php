@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-class PostController extends Controller
-{
+class PostController extends Controller {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index() {
         $posts = Post::all();
         return view('admin.posts.index', compact('posts'));
     }
@@ -24,9 +23,8 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
+    public function create() {
+        return view('admin.posts.create');
     }
 
     /**
@@ -35,9 +33,16 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $request->validate($this->getValidationRules());
+
+        $data = $request->all();
+        $post = new Post();
+        $post->fill($data);
+        $post->slug = $this->generatePostSlugFromTitle($post->title);
+        $post->save();
+
+        return redirect()->route('admin.posts.show', ['post' => $post->id]);
     }
 
     /**
@@ -46,8 +51,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         $post = Post::findOrFail($id);
         return view('admin.posts.show', compact('post'));
     }
@@ -58,8 +62,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -70,8 +73,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         //
     }
 
@@ -81,8 +83,32 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         //
+    }
+
+    private function generatePostSlugFromTitle($title) {
+        // generaimo slug base
+        // finchè slug esiste nel db
+        // aggiungiamo numero progressivo, 
+        // se non esiste, salvo slug nel model
+        $base_slug = Str::slug($title, '-'); // mio-post
+        $slug = $base_slug; // mio-post
+        $count = 1;
+        $post_found = Post::where('slug', '=', $slug)->first();
+        while ($post_found) {
+            $slug = $base_slug . '-' . $count; // mio-post-1
+            $post_found = Post::where('slug', '=', $slug)->first();
+            $count++; // 2
+        }
+
+        return $slug;
+    }
+
+    private function getValidationRules() {
+        return [
+            'title' => 'required|max:255',
+            'content' => 'required|max:30000'
+        ];
     }
 }
