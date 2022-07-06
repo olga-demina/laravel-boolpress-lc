@@ -1,0 +1,32 @@
+id: 2
+title: Mio secondo post
+slug: mio-secondo-post
+
+
+id: 56
+title: Mio secondo post
+slug: mio-secondo-post-1
+
+
+id: 87
+title: Mio secondo post
+slug: mio-secondo-post-2
+
+
+BACKOFFICE
+/admin/posts
+/admin/posts/2
+
+
+FRONTOFFICE
+/mio-secondo-post
+
+
+
+POSTS 
+id - PRIMARY_KEY
+title - VARCHAR(255)
+content - TEXT
+slug - VARCHAR(255) - UNIQUE
+timestamps
+
