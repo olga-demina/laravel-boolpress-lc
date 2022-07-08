@@ -53,8 +53,8 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        $post = Post::findOrFail($id);   
-        $category = $post->category;     
+        $post = Post::findOrFail($id);
+        $category = $post->category;
         return view('admin.posts.show', compact('post', 'category'));
     }
 
@@ -106,7 +106,7 @@ class PostController extends Controller {
         //
     }
 
-  
+
     private function getValidationRules() {
         return [
             'title' => 'required|max:255',
