@@ -20,6 +20,10 @@
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" class="form-control" name="title" id="title" value="{{ old('title') }}">
+
+            @error('title')
+                <p class="alert alert-danger">Titolo è richiesto</p>
+            @enderror
         </div>
         <div class="form-group">
             <label for="category_id">Categoria</label>

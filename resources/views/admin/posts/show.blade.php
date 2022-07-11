@@ -7,13 +7,20 @@
     <p>Categoria: {{ $category ? $category->name : 'nessuna categoria' }}</p>
 
     <p><strong>Tags: </strong>
-
         @forelse ($post->tags as $tag)
             {{ $tag->name }}{{ $loop->last ? '' : ', ' }}
         @empty
             nessuno
         @endforelse
     </p>
+
+    {{-- @if ($post->tags->isNotEmpty())
+        <p><strong>Tags</strong>
+            @foreach ($post->tags as $tag)
+                {{ $tag->name }}{{ $loop->last ? '' : ', ' }}
+            @endforeach
+        </p>
+    @endif --}}
 
     <p>{{ $post->content }}</p>
 
@@ -27,5 +34,4 @@
             <button class="btn btn-danger" type="submit">Cancella</button>
         </form>
     </div>
-
 @endsection
