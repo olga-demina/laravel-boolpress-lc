@@ -5,21 +5,7 @@
     <div class="row row-cols-3">
       <!-- Single post -->
       <div v-for="post in posts" :key="post.id" class="col">
-        <div class="card mb-3">
-          <!-- <img class="card-img-top" src="..." alt="Card image cap" /> -->
-          <div class="card-body">
-            <h5 class="card-title">{{ post.title }}</h5>
-            <p class="card-text">
-              {{ troncateText(post.content, 50) }}
-            </p>
-          </div>
-          <!-- <ul class="list-group list-group-flush">
-            <li class="list-group-item">Cras justo odio</li>
-          <div class="card-body">
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
-          </div> -->
-        </div>
+        <PostCard :post="post"/>
       </div>
       <!-- /Single post -->
     </div>
@@ -36,7 +22,12 @@
           >
         </li>
         <!-- Pages numbers -->
-        <li v-for="n in lastPage" :key="n" class="page-item" :class="{ active: currentPage === n }">
+        <li
+          v-for="n in lastPage"
+          :key="n"
+          class="page-item"
+          :class="{ active: currentPage === n }"
+        >
           <a @click="getPosts(n)" class="page-link" href="#">{{ n }}</a>
         </li>
         <!-- Next page button -->
@@ -51,14 +42,18 @@
 </template>
 
 <script>
+import PostCard from "../components/PostCard.vue";
 export default {
   name: "Posts",
+  components: {
+    PostCard,
+  },
   data() {
     return {
       posts: [],
       currentPage: 1,
       lastPage: 0,
-      totalPosts: 0
+      totalPosts: 0,
     };
   },
   created() {
@@ -77,18 +72,9 @@ export default {
           this.currentPage = resp.data.results.current_page;
           this.lastPage = resp.data.results.last_page;
           this.totalPosts = resp.data.results.total;
-
         });
     },
-    troncateText(text, maxCharNumber) {
-      // Se il testo è più lungo di maxCharNumber
-      // taglia il testo e aggiungi ...
-      // Altrimenti ritorna il testo intero
-      if (text.length > maxCharNumber) {
-        return text.substr(0, maxCharNumber) + "...";
-      }
-      return text;
-    },
+   
   },
 };
 </script>
