@@ -4,11 +4,12 @@
       <h1>{{ post.title }}</h1>
       <p>Category: {{ categoryName }}</p>
       <div class="mb-4">
-        <span
+        <router-link
+          :to="{ name: 'single-tag', params: { slug: tag.slug } }"
           v-for="tag in post.tags"
           :key="tag.id"
           class="badge rounded-pill bg-warning text-dark mr-3"
-          >{{ tag.name }}</span
+          >{{ tag.name }}</router-link
         >
       </div>
       <p>
@@ -16,7 +17,7 @@
       </p>
     </section>
     <section v-else>
-        <h2>Loading...</h2>
+      <h2>Loading...</h2>
     </section>
   </div>
 </template>
