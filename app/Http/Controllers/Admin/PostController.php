@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller {
     /**
@@ -40,15 +41,21 @@ class PostController extends Controller {
         $request->validate($this->getValidationRules());
 
         $data = $request->all();
+
+        if (isset($data['image'])) {
+            $image_path = Storage::put('post_covers', $data['image']);
+            $data['cover'] = $image_path;
+        }
+
         $post = new Post();
         $post->fill($data);
         $post->slug = Post::generatePostSlugFromTitle($post->title);
         $post->save();
 
-        if(isset($data['tags'])) {
+        if (isset($data['tags'])) {
             $post->tags()->sync($data['tags']);
         }
-        
+
         return redirect()->route('admin.posts.show', ['post' => $post->id]);
     }
 
@@ -91,6 +98,19 @@ class PostController extends Controller {
 
         $post = Post::findOrFail($id);
 
+        // Se nel data c'è immagine
+        if (isset($data['image'])) {
+            //  Cancellare l'immagine precedente se c'è
+            if ($post->cover) {
+                Storage::delete($post->cover);
+            }
+            //  Salvare l'immagine nuova
+            $image_path = Storage::put('post_covers', $data['image']);
+            //  Salvare il path dell'immagine nel data
+            $data['cover'] = $image_path;
+        }
+
+
         // Metodo fill + save
         // $post->fill($data);
         // $post->slug = Post::generatePostSlugFromTitle($post->title);
@@ -100,7 +120,7 @@ class PostController extends Controller {
         $data['slug'] = Post::generatePostSlugFromTitle($data['title']);
         $post->update($data);
 
-        if(isset($data['tags'])) {
+        if (isset($data['tags'])) {
             $post->tags()->sync($data['tags']);
         } else {
             $post->tags()->sync([]);
@@ -118,6 +138,10 @@ class PostController extends Controller {
     public function destroy($id) {
         $post = Post::findOrFail($id);
         $post->tags()->sync([]);
+        // Se c'è l'immagine cover, allora la cancelliamo
+        if($post->cover) {
+            Storage::delete($post->cover);
+        }
         $post->delete();
         return redirect()->route('admin.posts.index');
     }
@@ -128,7 +152,8 @@ class PostController extends Controller {
             'title' => 'required|max:255',
             'content' => 'required|max:30000',
             'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            'image' => 'image|max:512'
         ];
     }
 }
